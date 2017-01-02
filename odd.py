@@ -3,7 +3,7 @@ from enum import IntEnum
 from pprint import pprint
 from random import randint
 
-import odd_types
+from odd_types import *
 
 # Encounter - Peril
 class ArrowWall(object):
@@ -26,9 +26,13 @@ def Roll(dice):
   return sorted(result, key=lambda kv: (kv[0], -kv[1]))  # Asc type, Desc val
 
 def TestPrintSomeThings():
-  character = Rogue1Player()
+  character = Rogue1()
   pprint(Roll(character.GetDice()))
   pprint(Roll(character.GetDice()))
+  character = Warrior1()
+  pprint(Roll(character.GetDice()))
+  pprint(Roll(character.GetDice()))
+
   character.AddItem(ArrowWall().AsItemStats())
   character.AddItem(ArrowWall().AsItemStats())
   pprint(Roll(character.GetDice()))
