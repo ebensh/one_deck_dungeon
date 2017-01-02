@@ -3,8 +3,8 @@ from enum import IntEnum
 from pprint import pprint
 from random import randint
 
+from encounters import *
 from odd_types import *
-
 
 def Roll(dice):
   result = []
@@ -13,14 +13,14 @@ def Roll(dice):
       result.append((die_type, randint(1, 6)))
   return sorted(result, key=lambda kv: (kv[0], -kv[1]))  # Asc type, Desc val
 
-def TestPrintSomeThings():
+def TestPrintHeroesItemsAndRolls():
   character = Hero.Rogue()
   pprint(Roll(character.GetDiceCounts()))
   pprint(Roll(character.GetDiceCounts()))
   character = Hero.Warrior()
   pprint(Roll(character.GetDiceCounts()))
   pprint(Roll(character.GetDiceCounts()))
-
+  
   pprint(character.GetDiceCounts())
   character.AddItem(PerilEncounter.RunePuzzle().AsItemStats())
   pprint(character.GetDiceCounts())
@@ -34,8 +34,14 @@ def TestPrintSomeThings():
   pprint(Roll(character.GetDiceCounts()))
   pprint(Roll(character.GetDiceCounts()))
 
+def TestPrintTheDeck():
+  deck = GetEncounterCards()
+  for card in deck:
+    pprint(str(card))
+
 def main():
-  TestPrintSomeThings()
+  #TestPrintHeroesItemsAndRolls()
+  TestPrintTheDeck()
 
 if __name__ == '__main__':
   main()

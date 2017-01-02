@@ -1,13 +1,31 @@
 # from abc import ABCMeta, abstractmethod, abstractproperty
 from collections import Counter
-from enum import IntEnum
+from enum import Enum, IntEnum
 import re
 
 # Using IntEnum instead of Enum allows us to sort dice by type (ordered).
+#ConType = IntEnum('ConType', 'Health Time')
+#StatsType = IntEnum('StatsType', 'Strength Agility Magic Health')
+#DieType = IntEnum('DieType', 'Strength Agility Magic Heroic Any')
+
 # Con = Consequences.
-ConType = IntEnum('ConType', 'Health Time')
-StatsType = IntEnum('StatsType', 'Strength Agility Magic Health')
-DieType = IntEnum('DieType', 'Strength Agility Magic Heroic Any')
+class ConType(Enum):
+  Health = 'h'
+  Time = 't'
+  def __repr__(self): return self.value
+class StatsType(Enum):
+  Strength = 's'
+  Agility = 'a'
+  Magic = 'm'
+  Health = 'h'
+  def __repr__(self): return self.value
+class DieType(Enum):
+  Strength = 's'
+  Agility = 'a'
+  Magic = 'm'
+  Black = 'b'  # Technically "Heroic", but distinguish from "Health"
+  Any = 'x'
+  def __repr__(self): return self.value
 
 class HeroStats(Counter):
   '''A Counter of Strength, Agility, Magic, and Health.'''
@@ -15,6 +33,10 @@ class HeroStats(Counter):
     super(HeroStats, self).__init__({
       StatsType.Strength: strength, StatsType.Agility: agility,
       StatsType.Magic: magic, StatsType.Health:health})
+  def __repr__(self):
+    return '{{S:{0}, A:{1}, M:{2}, Hlth:{3}}}'.format(
+      self[StatsType.Strength], self[StatsType.Agility],
+      self[StatsType.Magic], self[StatsType.Health])
 
   @staticmethod
   def Strength(): return HeroStats(strength=1)
@@ -35,6 +57,8 @@ class Consequences(Counter):
   def __init__(self, health=0, time=0):
     super(Consequences, self).__init__({ConType.Health: health,
                                         ConType.Time: time})
+  def __repr__(self):
+    return 'h' * self[ConType.Health] + 't' * self[ConType.Time]
 
 # An individual box in the challenge set.
 class ChallengeBox(object):
@@ -45,6 +69,15 @@ class ChallengeBox(object):
     self._consequences = consequences
     self._is_wide = is_wide
     self._is_armor = is_armor
+
+  def __repr__(self):
+    return ''.join([
+      self._die_type.value,
+      self._requirement,
+      'w' if self._is_wide else '',
+      'a' if self._is_armor else '',
+      str(self._consequences)
+    ])    
 
   @staticmethod
   def Parse(description):
@@ -62,16 +95,14 @@ class ChallengeBox(object):
     time = len(time) if time else 0
     return ChallengeBox(die_type, requirement, Consequences(health, time),
                         wide, armor)
-                        
-
-  @staticmethod
-  def Peril(die_type, requirement, consequences):
-    return ChallengeBox(die_type, requirement, consequences, is_wide=True)
 
 # The group of challenge boxes to be completed.
 class ChallengeBoxes(object):
   def __init__(self, boxes=[]):
     self._boxes = boxes
+
+  def __repr__(self):
+    return '{' + ', '.join(map(str, self._boxes)) + '}'
 
   @staticmethod
   def Parse(boxes_description):
@@ -108,52 +139,3 @@ class Hero(object):
   @staticmethod
   def Warrior(): return Hero(strength=4, agility=2, magic=1, health=6)
   # TODO: Add 2player versions of heroes.
-
-class Encounter(object):
-  def __init__(self, experience, item_stats):
-    self._experience = experience
-    self._item_stats = item_stats
-    # TODO: Add Skills
-  def AsExperience(self): return self_.experience
-  def AsItemStats(self): return self._item_stats
-  # TODO: Add skills
-  # Times that encounter special abilities might be applied:
-  # - Before combat (Ice Elemental's Frost)
-  # - After the roll (Glooping Ooze's Split)
-  # - During combat (Bandit's Dodge, Shadow's Fade)
-  # - After the dice are placed (Beetle's Survivor)
-
-class CombatEncounter(Encounter):
-  def __init__(self, challenge, experience, item_stats):
-    # TODO: Add monster special abilities
-    self._challenge = challenge
-    super(CombatEncounter, self).__init__(experience, item_stats)
-
-  @staticmethod
-  def Skeleton(variant=False):
-    stats = HeroStats.Agility() if variant else HeroStats.Strength()
-    return CombatEncounter(
-      ChallengeBoxes.Parse('m2a,m4a,s3t,s5ht,a5ht,s6t'), 2, stats)
-
-class PerilEncounter(Encounter):
-  def __init__(self, paid_challenge, free_challenge, swap_cost,
-               experience, item_stats):
-    self._paid_challenge = paid_challenge
-    self._free_challenge = free_challenge
-    self._swap_cost = swap_cost
-    super(PerilEncounter, self).__init__(experience, item_stats)
-
-  @staticmethod
-  def RunePuzzle(variant=False):
-    stats = HeroStats.Agility() if variant else HeroStats.Strength()
-    return PerilEncounter(
-      ChallengeBox.Peril(DieType.Magic, 6, Consequences(1, 3)),
-      ChallengeBox.Peril(DieType.Strength, 11, Consequences(3, 2)),
-      Consequences(time=2), 2, stats)
-
-class EncounterDeck(object):
-  _encounters = [PerilEncounter.RunePuzzle(),
-                 PerilEncounter.RunePuzzle(variant=True),
-                 CombatEncounter.Skeleton(),
-                 CombatEncounter.Skeleton(variant=True)]
-  
