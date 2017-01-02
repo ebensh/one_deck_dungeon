@@ -1,19 +1,21 @@
-from enum import Enum
+from collections import Counter
+from enum import IntEnum
+import random
 
-DieType = Enum('DieType', 'Strength Agility Magic Heroic Any')
+# Consequences
+ConType = IntEnum('ConType', 'Health Time')
+StatsType = IntEnum('StatsType', 'Strength Agility Magic Health')
+DieType = IntEnum('DieType', 'Strength Agility Magic Heroic Any')
 
 class Consequences(object):
-  self.health = 0
-  self.time = 0
-  def __init__(self, health=0, time=0): self.health = health; self.time = time
+  def __init__(self, health=0, time=0):
+    self._health = health
+    self._time = time
+  def AsCounter(self):
+    return Counter({ConType.Health: self._health, ConType.Time: self._time})
+                   
 
 class ChallengeBox(object):
-  self._die_type = DieType.Any
-  self._requirement = 0
-  self._consequneces = Consequences()
-  self._is_wide = False
-  self._is_armor = False
-
   def __init__(self, die_type, requirement, consequences, is_wide, is_armor):
     self._die_type = die_type
     self._requirement = requirement
@@ -21,31 +23,56 @@ class ChallengeBox(object):
     self._is_wide = is_wide
     self._is_armor = is_armor
 
-
 class Rogue1Player(object):
-  self._dice = {DiceType.Strength: 1,
-                DiceType.Agility: 4,
-                DiceType.Magic: 2,
-                DiceType.Heroic: 0}
-  self._health = 5
+  _stats = Counter({StatsType.Strength: 1,
+                    StatsType.Agility: 4,
+                    StatsType.Magic: 2,
+                    StatsType.Health: 5})
+  _items = []
+
+  def AddItem(self, item): self._items.append(item)
+  def GetDice(self):
+    total_stats = self._stats
+    for item in self._items:
+      total_stats += item
+    return Counter({DieType.Strength: total_stats[StatsType.Strength],
+                    DieType.Agility: total_stats[StatsType.Agility],
+                    DieType.Magic: total_stats[StatsType.Magic]})
   # TODO: Add skills
 
 
 # Encounter - Peril
 class ArrowWall(object):
-  self.primary_option = ChallengeBox(DieType.Agility, 11,
-                                     Consequences(health=3, time=2),
-                                     is_wide=True, is_armor=False)
-  self.secondary_option = ChallengeBox(DieType.Magic, 6,
-                                       Consequences(health=2, time=3),
-                                       is_wide=True, is_armor=False)
-  self.secondary_cost = Consequences(time=1)
-  self.as_experience = 2
-  self.as_item =
-  # TODO: add skills
+  first_option = ChallengeBox(DieType.Agility, 11,
+                                   Consequences(health=3, time=2),
+                                   is_wide=True, is_armor=False)
+  second_option = ChallengeBox(DieType.Magic, 6,
+                                    Consequences(health=2, time=3),
+                                    is_wide=True, is_armor=False)
+  second_cost = Consequences(time=1)
+  def AsExperience(self): return 2
+  def AsItemStats(self): return Counter({StatsType.Magic: 1})
+  # TODO: add skills and potions
+
+def Roll(dice):
+  result = []
+  for die_type, num_dice in dice.iteritems():
+    for _ in xrange(num_dice + 1):
+      result.append((die_type, random.randint(1, 6)))
+  return sorted(result)
+    
 
 def main():
-  print "Hello, world! :)"
+  character = Rogue1Player()
+  print Roll(character.GetDice())
+  print Roll(character.GetDice())
+  print Roll(character.GetDice())
+  character.AddItem(ArrowWall().AsItemStats())
+  character.AddItem(ArrowWall().AsItemStats())
+  character.AddItem(ArrowWall().AsItemStats())
+  character.AddItem(ArrowWall().AsItemStats())
+  print Roll(character.GetDice())
+  
 
 if __name__ == '__main__':
   main()
