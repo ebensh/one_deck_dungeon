@@ -114,7 +114,8 @@ class ChallengeBoxes(object):
 class Hero(object):
   _stats = Counter()
   _items = []
-  def __init__(self, strength, agility, magic, health):
+  def __init__(self, name, strength, agility, magic, health):
+    self._name = name
     self._stats = Counter({StatsType.Strength: strength,
                            StatsType.Agility: agility,
                            StatsType.Magic: magic,
@@ -128,14 +129,25 @@ class Hero(object):
                     DieType.Agility: total_stats[StatsType.Agility],
                     DieType.Magic: total_stats[StatsType.Magic]})
 
+  def __repr__(self):
+    dice = self.GetDiceCounts()
+    return '{0}Hero{{S:{1}, A:{2}, M:{3}}}'.format(
+      self._name, dice[DieType.Strength], dice[DieType.Agility],
+      dice[DieType.Magic])
+
   @staticmethod
-  def Archer(): return Hero(strength=2, agility=3, magic=2, health=5)
+  def Archer():
+    return Hero('Archer', strength=2, agility=3, magic=2, health=5)
   @staticmethod
-  def Mage(): return Hero(strength=1, agility=2, magic=4, health=5)
+  def Mage():
+    return Hero('Mage', strength=1, agility=2, magic=4, health=5)
   @staticmethod
-  def Paladin(): return Hero(strength=3, agility=1, magic=3, health=5)
+  def Paladin():
+    return Hero('Paladin', strength=3, agility=1, magic=3, health=5)
   @staticmethod
-  def Rogue(): return Hero(strength=1, agility=4, magic=2, health=5)
+  def Rogue():
+    return Hero('Rogue', strength=1, agility=4, magic=2, health=5)
   @staticmethod
-  def Warrior(): return Hero(strength=4, agility=2, magic=1, health=6)
+  def Warrior():
+    return Hero('Warrior', strength=4, agility=2, magic=1, health=6)
   # TODO: Add 2player versions of heroes.
