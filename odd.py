@@ -14,17 +14,25 @@ def Roll(dice):
   return sorted(result, key=lambda kv: (kv[0], -kv[1]))  # Asc type, Desc val
 
 def TestPrintSomeThings():
-  character = Rogue1()
-  pprint(Roll(character.GetDice()))
-  pprint(Roll(character.GetDice()))
-  character = Warrior1()
-  pprint(Roll(character.GetDice()))
-  pprint(Roll(character.GetDice()))
+  character = Hero.Rogue()
+  pprint(Roll(character.GetDiceCounts()))
+  pprint(Roll(character.GetDiceCounts()))
+  character = Hero.Warrior()
+  pprint(Roll(character.GetDiceCounts()))
+  pprint(Roll(character.GetDiceCounts()))
 
-  character.AddItem(ArrowWall().AsItemStats())
-  character.AddItem(ArrowWall().AsItemStats())
-  pprint(Roll(character.GetDice()))
-  pprint(vars(ArrowWall().first_option))
+  pprint(character.GetDiceCounts())
+  character.AddItem(PerilEncounter.RunePuzzle().AsItemStats())
+  pprint(character.GetDiceCounts())
+  character.AddItem(PerilEncounter.RunePuzzle(variant=True).AsItemStats())
+  pprint(character.GetDiceCounts())
+  character.AddItem(CombatEncounter.Skeleton().AsItemStats())
+  pprint(character.GetDiceCounts())
+  character.AddItem(CombatEncounter.Skeleton(variant=True).AsItemStats())
+  pprint(character.GetDiceCounts())
+
+  pprint(Roll(character.GetDiceCounts()))
+  pprint(Roll(character.GetDiceCounts()))
 
 def main():
   TestPrintSomeThings()
