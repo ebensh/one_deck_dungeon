@@ -72,7 +72,7 @@ class ChallengeBox(object):
       'w' if self._is_wide else '',
       'a' if self._is_armor else '',
       str(self._consequences)
-    ])    
+    ])
 
   @staticmethod
   def Parse(description):
@@ -97,7 +97,7 @@ class ChallengeBoxes(object):
     self._boxes = boxes
 
   def __repr__(self):
-    return '{' + ', '.join(map(str, self._boxes)) + '}'
+    return '[' + ', '.join(map(str, self._boxes)) + ']'
 
   @staticmethod
   def Parse(boxes_description):

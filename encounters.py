@@ -39,7 +39,7 @@ class CombatEncounter(Encounter):
     stats = HeroStats.Agility() if variant else HeroStats.Strength()
     return CombatEncounter('Skeleton',
       ChallengeBoxes.Parse('m2a,m4a,s3t,s5ht,a5ht,s6t'), 2, stats)
-  
+
 
 class PerilEncounter(Encounter):
   def __init__(self, name, paid_challenge, free_challenge, swap_cost,
@@ -67,7 +67,7 @@ class PerilEncounter(Encounter):
     return PerilEncounter('RunePuzzle',
       ChallengeBox.Parse('m6whttt'), ChallengeBox.Parse('s11whhhtt'),
       Consequences(time=2), 2, stats)
-  
+
 
 def GetEncounterCards():
   encounter_factories = [CombatEncounter.FireElemental,
