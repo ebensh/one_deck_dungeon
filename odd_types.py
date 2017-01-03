@@ -3,11 +3,6 @@ from collections import Counter
 from enum import Enum, IntEnum
 import re
 
-# Using IntEnum instead of Enum allows us to sort dice by type (ordered).
-#ConType = IntEnum('ConType', 'Health Time')
-#StatsType = IntEnum('StatsType', 'Strength Agility Magic Health')
-#DieType = IntEnum('DieType', 'Strength Agility Magic Heroic Any')
-
 # Con = Consequences.
 class ConType(Enum):
   Health = 'h'

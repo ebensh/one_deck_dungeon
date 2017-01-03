@@ -1,15 +1,9 @@
 from pprint import pprint
-from random import randint, shuffle
+from random import shuffle
 
 from encounters import *
 from odd_types import *
-
-def Roll(dice):
-  result = []
-  for die_type, num_dice in dice.iteritems():
-    for _ in xrange(num_dice + 1):
-      result.append((die_type, randint(1, 6)))
-  return sorted(result, key=lambda kv: (kv[0], -kv[1]))  # Asc type, Desc val
+from odd_utils import *
 
 def TestPrintHeroesItemsAndRolls():
   character = Hero.Rogue()
