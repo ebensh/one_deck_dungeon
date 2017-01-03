@@ -39,7 +39,6 @@ class CombatEncounter(Encounter):
     stats = HeroStats.Agility() if variant else HeroStats.Strength()
     return CombatEncounter('Skeleton',
       ChallengeBoxes.Parse('m2a,m4a,s3t,s5ht,a5ht,s6t'), 2, stats)
-
   
 
 class PerilEncounter(Encounter):
