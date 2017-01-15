@@ -72,7 +72,7 @@ class ChallengeBox(object):
       'w' if self._is_wide else '',
       'a' if self._is_armor else '',
       str(self._consequences)
-    ])    
+    ])
 
   @staticmethod
   def Parse(description):

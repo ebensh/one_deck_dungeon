@@ -14,8 +14,6 @@ def main():
   hero = Hero.Warrior()
   encounter = CombatEncounter.Skeleton()
   print hero, encounter
-  challenge_boxes = encounter._challenge
-  print challenge_boxes
 
   # Assume all the dice are fixed (no skills will come into play).
   # Try every legal assignment of dice, and take the minimum penalty.
@@ -27,6 +25,8 @@ def main():
   def box_cost(box):
     return (1.49 * box._consequences[ConType.Health] +
             box._consequences[ConType.Time])
+  def box_priority(box):
+    return 1000 * box_.is_armor + box_cost(box)
 
   NUM_TRIALS = 1
   for trial in xrange(1, NUM_TRIALS + 1):
@@ -50,8 +50,6 @@ def main():
     print challenge_boxes
     print possible_placements
 
-    for enumerate(possible_placements)
-    
 
 if __name__ == '__main__':
   main()
