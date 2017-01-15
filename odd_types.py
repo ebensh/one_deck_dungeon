@@ -68,7 +68,7 @@ class ChallengeBox(object):
   def __repr__(self):
     return ''.join([
       self._die_type.value,
-      self._requirement,
+      str(self._requirement),
       'w' if self._is_wide else '',
       'a' if self._is_armor else '',
       str(self._consequences)
@@ -83,28 +83,13 @@ class ChallengeBox(object):
     elif die_type == 'm': die_type = DieType.Magic
     elif die_type == 's': die_type = DieType.Strength
     else: assert False  # Should not happen.
-    requirement = requirement if requirement else 0
+    requirement = int(requirement) if requirement else 0
     wide = True if wide else False
     armor = True if armor else False
     health = len(health) if health else 0
     time = len(time) if time else 0
     return ChallengeBox(die_type, requirement, Consequences(health, time),
                         wide, armor)
-
-# The group of challenge boxes to be completed.
-class ChallengeBoxes(object):
-  def __init__(self, boxes=[]):
-    self._boxes = boxes
-
-  def __repr__(self):
-    return '{' + ', '.join(map(str, self._boxes)) + '}'
-
-  @staticmethod
-  def Parse(boxes_description):
-    boxes = []
-    for box_description in boxes_description.split(','):
-      boxes.append(ChallengeBox.Parse(box_description))
-    return ChallengeBoxes(boxes)
 
 class Hero(object):
   _stats = Counter()

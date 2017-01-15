@@ -1,5 +1,12 @@
 from odd_types import *
 
+def ParseChallengeBoxes(boxes_description):
+  boxes = []
+  for box_description in boxes_description.split(','):
+    boxes.append(ChallengeBox.Parse(box_description))
+  return boxes
+
+
 class Encounter(object):
   def __init__(self, name, experience, item_stats):
     self._name = name
@@ -32,13 +39,13 @@ class CombatEncounter(Encounter):
   def FireElemental(variant=False):
     stats = HeroStats.MagicHealth() if variant else HeroStats.AgilityHealth()
     return CombatEncounter('FireElemental',
-      ChallengeBoxes.Parse('m3t,a3t,m6ht,m11whht,a6ht'), 4, stats)
+      ParseChallengeBoxes('m3t,a3t,m6ht,m11whht,a6ht'), 4, stats)
 
   @staticmethod
   def Skeleton(variant=False):
     stats = HeroStats.Agility() if variant else HeroStats.Strength()
     return CombatEncounter('Skeleton',
-      ChallengeBoxes.Parse('m2a,m4a,s3t,s5ht,a5ht,s6t'), 2, stats)
+      ParseChallengeBoxes('m2a,m4a,s3t,s5ht,a5ht,s6t'), 2, stats)
   
 
 class PerilEncounter(Encounter):
