@@ -15,6 +15,40 @@ def IsDieEligibleForBox(die_type, die_value, box):
   value_sufficient = (die_value >= box._requirement or box._is_wide)
   return types_match and value_sufficient
 
+def GetDieToBoxPossibilities(rolled_dice, challenge_boxes):
+  die_to_eligible_boxes = []
+  for (die_type, die_value) in rolled_dice:      
+    die_to_eligible_boxes.append(
+      [box_ix for box_ix, box in enumerate(challenge_boxes)
+       if IsDieEligibleForBox(die_type, die_value, box)])
+  return die_to_eligible_boxes
+
+def GetConsequences(rolled_dice, challenge_boxes, assignments):
+  # Figure out how much (numerically) we have assigned to each challenge box.
+  box_sums = [0] * len(challenge_boxes)
+  for die_ix, box_ix in enumerate(assignments):
+    if box_ix is None: continue
+    box_sums[box_ix] += rolled_dice[die_ix][1]
+
+  # Figure out which boxes are numerically satisfied.
+  are_boxes_satisfied = [box_sum >= box._requirement
+                         for (box, box_sum) in zip(challenge_boxes, box_sums)]
+  # Have we satisfied all the armor boxes?
+  is_armor_satisfied = all(
+    [not box._is_armor or (box._is_armor and box_is_satisfied)
+     for (box, box_is_satisfied)
+     in zip(challenge_boxes, are_boxes_satisfied)])
+  
+  # If we haven't satisfied any armor box, then no boxes are satisfied.
+  if not is_armor_satisfied:
+    are_boxes_satisfied = [False] * len(are_boxes_satisfied)
+
+  return sum([box._consequences
+              for box, is_satisfied in zip(challenge_boxes, are_boxes_satisfied)
+              if not is_satisfied], Consequences())
+
+
+
 # Generates lists that are each the same length as die_to_eligible_boxes (the
 # number of rolled dice). The list contains the index of the box each die is
 # assigned to, or None if the die was not assigned.
@@ -50,14 +84,13 @@ def ConsequencesToCost(consequences):
 
 # TODO: Create accessors to all "private" members accessed.
 def main():
-  seed(2)  # While debugging
-  
   hero = Hero.Warrior()
   encounter = CombatEncounter.Skeleton()
   print hero, encounter
   challenge_boxes = encounter._challenge
 
-  NUM_TRIALS = 1
+  average_consequences = Consequences()
+  NUM_TRIALS = 1000
   for trial in xrange(1, NUM_TRIALS + 1):
     rolled_dice = Roll(hero.GetDiceCounts())
     # Sort the rolled dice by type and value ascending.
@@ -65,45 +98,35 @@ def main():
     # Rolled dice arrangement is now fixed so that we can rely on indicies.
     print "Trial #{0}: Rolled {1}".format(trial, rolled_dice)
 
-    die_to_eligible_boxes = []
-    for (die_type, die_value) in rolled_dice:      
-      die_to_eligible_boxes.append(
-        [box_ix for box_ix, box in enumerate(challenge_boxes)
-         if IsDieEligibleForBox(die_type, die_value, box)])
-    print rolled_dice
-    print challenge_boxes
-    print die_to_eligible_boxes
-
-    possible_moves = []
+    die_to_eligible_boxes = GetDieToBoxPossibilities(rolled_dice,
+                                                     challenge_boxes)
+    #print rolled_dice
+    #print challenge_boxes
+    #print die_to_eligible_boxes
+    
+    # Create a list of all the possible assignments and their consequences.
+    possible_assignments = []
     for assignments in GenerateAssignments(
         die_to_eligible_boxes, map(lambda box: box._is_wide, challenge_boxes)):
-      box_sums = [0] * len(challenge_boxes)
-      for die_ix, box_ix in enumerate(assignments):
-        if box_ix is None: continue
-        box_sums[box_ix] += rolled_dice[die_ix][1]
+      consequences = GetConsequences(rolled_dice, challenge_boxes, assignments)
+      possible_assignments.append((assignments, consequences))
 
-      are_boxes_satisfied = [box_sum >= box._requirement
-                             for (box, box_sum) in zip(challenge_boxes, box_sums)]
-      is_armor_satisfied = all([not box._is_armor or (box._is_armor and box_is_satisfied)
-                                for (box, box_is_satisfied)
-                                in zip(challenge_boxes, are_boxes_satisfied)])
-      if not is_armor_satisfied:
-        are_boxes_satisfied = [False] * len(are_boxes_satisfied)
+    # Sort the possible moves using a cost function.
+    possible_assignments.sort(key=lambda move_and_consequences: ConsequencesToCost(move_and_consequences[1]))
 
-      consequences = sum([box._consequences
-                          for box, is_satisfied in zip(challenge_boxes, are_boxes_satisfied)
-                          if not is_satisfied], Consequences())
-      possible_moves.append((assignments, consequences))
+    #print "Worst 3 moves:"
+    #for move in possible_assignments[:3]: print move
+    #print "Best 3 moves:"
+    #for move in possible_assignments[-3:]: print move
 
-    
-    scored_moves = [(move, ConsequencesToCost(consequences))
-                    for (move, consequences) in possible_moves]
-    scored_moves.sort(key=lambda move_and_score: move_and_score[1])
-    print "Worst 3 moves:"
-    for move in scored_moves[:3]: print move
-    print "Best 3 moves:"
-    for move in scored_moves[-3:]: print move
+    # Record this trial's best move's consequences and cost
+    best_move, consequences = possible_assignments[-1]
+    average_consequences += consequences
 
+  # After all the trials are done, output an average cost.
+  print "Average consequences of encounter:"
+  for key, value in average_consequences.iteritems():
+    print key, float(value) / NUM_TRIALS
     
 if __name__ == '__main__':
   main()
