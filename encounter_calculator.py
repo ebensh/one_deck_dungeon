@@ -80,12 +80,12 @@ def GenerateAssignments(die_to_eligible_boxes, is_box_wide):
 #   game this is situational.
 def ConsequencesToCost(consequences):
   return -1.49 * consequences[ConType.Health] - consequences[ConType.Time]
-      
 
 # TODO: Create accessors to all "private" members accessed.
 def main():
-  hero = Hero.Warrior()
-  encounter = CombatEncounter.Skeleton()
+  #hero = Hero.Warrior(); encounter = CombatEncounter.Skeleton()  # Armored
+  hero = Hero.Mage(); encounter = CombatEncounter.FireElemental()  # Wide box
+  
   print hero, encounter
   challenge_boxes = encounter._challenge
 

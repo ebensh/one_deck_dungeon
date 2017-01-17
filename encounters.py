@@ -36,16 +36,80 @@ class CombatEncounter(Encounter):
       self._name, self._challenge, self._experience, self._item_stats)
 
   @staticmethod
+  def Bandit(variant=False):
+    stats = HeroStats.Magic() if variant else HeroStats.Agility()
+    return CombatEncounter('Bandit',
+      ParseChallengeBoxes('a8whh,a3h,a4t,s5tt,s5ht'), 3, stats)
+  
+  @staticmethod
+  def Beetle(variant=False):
+    stats = HeroStats.Magic()  # Both variants
+    return CombatEncounter('Beetle',
+      ParseChallengeBoxes('a3a,a4a,s5a,m3a,a4tt,s6ht'), 2, stats)
+
+  @staticmethod
   def FireElemental(variant=False):
     stats = HeroStats.MagicHealth() if variant else HeroStats.AgilityHealth()
     return CombatEncounter('FireElemental',
       ParseChallengeBoxes('m3t,a3t,m6ht,m11whht,a6ht'), 4, stats)
 
   @staticmethod
+  def GloopingOoze(variant=False):
+    stats = HeroStats.Magic() if variant else HeroStats.StrengthHealth()
+    return CombatEncounter('GloopingOoze',
+      ParseChallengeBoxes('m2a,m3a,s4ht,s4ht,m5tt,s6ht'), 3, stats)
+  
+  @staticmethod
+  def Goblin(variant=False):
+    # TODO: Replace the first box with its proper X! It depends on the number
+    # of open doors. I've put 4 as a placeholder (assuming 1 door open).
+    stats = HeroStats.Strength()  # Both variants
+    return CombatEncounter('Goblin',
+      ParseChallengeBoxes('s4a,s3h,a4t,a4ht,s5hh'), 2, stats)
+
+  @staticmethod
+  def IceElemental(variant=False):
+    stats = HeroStats.AgilityHealth()  # Both variants
+    return CombatEncounter('IceElemental',
+      ParseChallengeBoxes('s11wa,s3t,m4hh,m5ht,m6ht'), 4, stats)
+
+  @staticmethod
+  def Ogre(variant=False):
+    stats = HeroStats.MagicHealth() if variant else HeroStats.StrengthHealth()
+    return CombatEncounter('Ogre',
+      ParseChallengeBoxes('s6wh,a4t,s9whh,a5ht,s12whhh,a6ht'), 4, stats)
+  
+  @staticmethod
+  def Phantom(variant=False):
+    stats = HeroStats.AgilityHealth() if variant else HeroStats.StrengthHealth()
+    return CombatEncounter('Phantom',
+      ParseChallengeBoxes('s4a,a4a,a5hh,a6ht,s5ht,s6hh'), 4, stats)
+
+  @staticmethod
+  def PlagueRat(variant=False):
+    stats = HeroStats.Agility()  # Both variants
+    # TODO: Replace the first box with its proper X! It depends on the number
+    # of open doors. I've put 4 as a placeholder (assuming 1 door open).
+    return CombatEncounter('PlagueRat',
+      ParseChallengeBoxes('a4wa,a3ht,s3t,s5ht,a5tt'), 2, stats)
+
+  @staticmethod
+  def Shadow(variant=False):
+    stats = HeroStats.Agility() if variant else HeroStats.StrengthHealth()
+    return CombatEncounter('Shadow',
+      ParseChallengeBoxes('a10wa,s5ht,m3ht,m4ht,m5ht'), 3, stats)
+  
+  @staticmethod
   def Skeleton(variant=False):
     stats = HeroStats.Agility() if variant else HeroStats.Strength()
     return CombatEncounter('Skeleton',
       ParseChallengeBoxes('m2a,m4a,s3t,s5ht,a5ht,s6t'), 2, stats)
+
+  @staticmethod
+  def Wraith(variant=False):
+    stats = HeroStats.Strength()  # Both variants
+    return CombatEncounter('Wraith',
+      ParseChallengeBoxes('m9wa,s5a,s3tt,s5hh,m6ht'), 3, stats)
 
 class PerilEncounter(Encounter):
   def __init__(self, name, paid_challenge, free_challenge, swap_cost,
@@ -58,7 +122,56 @@ class PerilEncounter(Encounter):
   def __repr__(self):
     return 'Peril{{{0}: {1}, {2}, swap:{3}, exp:{4}, item:{5}}}'.format(
       self._name, self._paid_challenge, self._free_challenge,
-      self._swap_cost, self._experience, self._item_stats)
+      self._swap_cost, self._experience, self._item_stats)  
+
+  @staticmethod
+  def ArrowWall(variant=False):
+    stats = HeroStats.Magic() if variant else HeroStats.Strength()
+    return PerilEncounter('ArrowWall',
+      ChallengeBox.Parse('m6whhttt'), ChallengeBox.Parse('a11whhhtt'),
+      Consequences(time=1), 2, stats)
+
+  @staticmethod
+  def BearTraps(variant=False):
+    stats = HeroStats.Magic() if variant else HeroStats.Agility()
+    return PerilEncounter('BearTraps',
+      ChallengeBox.Parse('a6whht'), ChallengeBox.Parse('a11whhhtt'),
+      Consequences(time=3), 2, stats)
+
+  @staticmethod
+  def Boulder(variant=False):
+    stats = HeroStats.MagicHealth() if variant else HeroStats.StrengthHealth()
+    return PerilEncounter('Boulder',
+      ChallengeBox.Parse('m11whhhtt'), ChallengeBox.Parse('a14whhhht'),
+      Consequences(time=3), 4, stats)
+
+  @staticmethod
+  def CaveIn(variant=False):
+    stats = HeroStats.Magic() if variant else HeroStats.Agility()
+    return PerilEncounter('CaveIn',
+      ChallengeBox.Parse('s6whttt'), ChallengeBox.Parse('a11whhtt'),
+      Consequences(time=2), 2, stats)
+
+  @staticmethod
+  def FlameStatues(variant=False):
+    stats = HeroStats.Magic() if variant else HeroStats.Strength()
+    return PerilEncounter('FlameStatues',
+      ChallengeBox.Parse('m8whhttt'), ChallengeBox.Parse('a14whhht'),
+      Consequences(time=3), 3, stats)
+  
+  @staticmethod
+  def ForceWall(variant=False):
+    stats = HeroStats.MagicHealth() if variant else HeroStats.StrengthHealth()
+    return PerilEncounter('ForceWall',
+      ChallengeBox.Parse('a11whhtttt'), ChallengeBox.Parse('m14whhhhtt'),
+      Consequences(time=3), 4, stats)
+
+  @staticmethod
+  def LockedDoor(variant=False):
+    stats = HeroStats.Magic() if variant else HeroStats.Strength()
+    return PerilEncounter('LockedDoor',
+      ChallengeBox.Parse('a8whtttt'), ChallengeBox.Parse('s11whhtt'),
+      Consequences(time=1), 2, stats)
 
   @staticmethod
   def PitOfSpikes(variant=False):
@@ -74,12 +187,37 @@ class PerilEncounter(Encounter):
       ChallengeBox.Parse('m6whttt'), ChallengeBox.Parse('s11whhhtt'),
       Consequences(time=2), 2, stats)
 
+  @staticmethod
+  def SpikedLog(variant=False):
+    stats = HeroStats.Agility()  # Both variants
+    return PerilEncounter('SpikedLog',
+      ChallengeBox.Parse('s8whhht'), ChallengeBox.Parse('a14whhhtt'),
+      Consequences(time=2), 3, stats)
+
 
 def GetEncounterCards():
-  encounter_factories = [CombatEncounter.FireElemental,
+  encounter_factories = [CombatEncounter.Bandit,
+                         CombatEncounter.Beetle,
+                         CombatEncounter.FireElemental,
+                         CombatEncounter.GloopingOoze,
+                         CombatEncounter.Goblin,
+                         CombatEncounter.IceElemental,
+                         CombatEncounter.Ogre,
+                         CombatEncounter.Phantom,
+                         CombatEncounter.PlagueRat,
+                         CombatEncounter.Shadow,
                          CombatEncounter.Skeleton,
+                         CombatEncounter.Wraith,
+                         PerilEncounter.ArrowWall,
+                         PerilEncounter.BearTraps,
+                         PerilEncounter.Boulder,
+                         PerilEncounter.CaveIn,
+                         PerilEncounter.FlameStatues,
+                         PerilEncounter.ForceWall,
+                         PerilEncounter.LockedDoor,
                          PerilEncounter.RunePuzzle,
-                         PerilEncounter.PitOfSpikes]
+                         PerilEncounter.PitOfSpikes,
+                         PerilEncounter.SpikedLog]
   cards = []
   for encounter_factory in encounter_factories:
     cards.append(encounter_factory(False))
