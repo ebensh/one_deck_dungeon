@@ -195,7 +195,7 @@ class PerilEncounter(Encounter):
       Consequences(time=2), 3, stats)
 
 
-def GetEncounterCards():
+def GetEncounterCards(with_variants=True):
   encounter_factories = [CombatEncounter.Bandit,
                          CombatEncounter.Beetle,
                          CombatEncounter.FireElemental,
@@ -221,5 +221,6 @@ def GetEncounterCards():
   cards = []
   for encounter_factory in encounter_factories:
     cards.append(encounter_factory(False))
-    cards.append(encounter_factory(True))
+    if with_variants:
+      cards.append(encounter_factory(True))
   return cards

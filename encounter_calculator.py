@@ -82,7 +82,7 @@ def ConsequencesToCost(consequences):
 
 def GetAverageConsequences(dice_counts, challenge_boxes):
   average_consequences = Consequences()
-  NUM_TRIALS = 1000
+  NUM_TRIALS = 500
   for trial in xrange(1, NUM_TRIALS + 1):
     rolled_dice = Roll(dice_counts)
     # Sort the rolled dice by type and value ascending.
@@ -121,41 +121,30 @@ def GetAverageConsequences(dice_counts, challenge_boxes):
 def main():
   heroes = [Hero.Archer(), Hero.Mage(), Hero.Paladin(), Hero.Rogue(),
             Hero.Warrior()]
-  encounters = GetEncounterCards()
+  encounters = GetEncounterCards(with_variants=False)
 
   with sys.stdout as csvfile:
-    fieldnames = ['encounter', 'experience']
-    for hero in heroes:
-      fieldnames.append(hero._name + '_health_dmg')
-      fieldnames.append(hero._name + '_time_dmg')
+    fieldnames = ['encounter', 'hero', 'experience', 'health_dmg', 'time_dmg']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
 
-    for encounter_ix, encounter in enumerate(encounters):
-      for hero_ix, hero in enumerate(heroes):
-        
-        # TODO: Replace private member access with accessors
-        consequences = None
-        if type(encounter) is CombatEncounter:
-          consequences = GetAverageConsequences(
-            hero.GetDiceCounts(), encounter._challenge)
-          writer.writerow({'encounter': encounter._name,
-                           'experience': encounter.AsExperience(),
-                           hero._name + '_health_dmg': consequences[ConType.Health],
-                           hero._name + '_time_dmg': consequences[ConType.Time]})
-        elif type(encounter) is PerilEncounter:
-          free_consequences = GetAverageConsequences(
-            hero.GetDiceCounts(), encounter._free_challenge)
-          paid_consequences = GetAverageConsequences(
-          hero.GetDiceCounts(), encounter._paid_challenge) + encounter._swap_cost
-          writer.writerow({'encounter': encounter._name + '_free',
-                           'experience': encounter.AsExperience(),
-                           hero._name + '_health_dmg': free_consequences[ConType.Health],
-                           hero._name + '_time_dmg': free_consequences[ConType.Time]})
-          writer.writerow({'encounter': encounter._name + '_paid',
-                           'experience': encounter.AsExperience(),
-                           hero._name + '_health_dmg': paid_consequences[ConType.Health],
-                           hero._name + '_time_dmg': paid_consequences[ConType.Time]})                            
+    for encounter in encounters:
+      csv_row = {'experience': encounter.AsExperience()}
+      encounter_setups = []
+      if type(encounter) is CombatEncounter:
+        encounter_setups = [(encounter._name, encounter._challenge)]
+      elif type(encounter) is PerilEncounter:
+        encounter_setups = [(encounter._name + '_free', encounter._free_challenge),
+                            (encounter._name + '_paid', encounter._paid_challenge)]
+      for encounter_name, challenge in encounter_setups:
+        csv_row['encounter'] = encounter_name
+        for hero in heroes:
+          consequences = GetAverageConsequences(hero.GetDiceCounts(), challenge)
+          csv_row['hero'] = hero._name
+          csv_row['health_dmg'] = consequences[ConType.Health]
+          csv_row['time_dmg'] = consequences[ConType.Time]
+          writer.writerow(csv_row)
+
     
 if __name__ == '__main__':
   main()
