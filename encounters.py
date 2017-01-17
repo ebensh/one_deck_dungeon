@@ -13,7 +13,7 @@ class Encounter(object):
     self._experience = experience
     self._item_stats = item_stats
     # TODO: Add Skills
-  def AsExperience(self): return self_.experience
+  def AsExperience(self): return self._experience
   def AsItemStats(self): return self._item_stats
   # TODO: Add skills
   # Times that encounter special abilities might be applied:

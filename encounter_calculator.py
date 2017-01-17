@@ -1,8 +1,6 @@
-from copy import deepcopy
-import matplotlib.pyplot as plt
-import networkx as nx
-from pprint import pprint
-from random import randint, seed, shuffle
+import csv
+#from pprint import pprint
+#from random import seed, shuffle
 
 from encounters import *
 from odd_types import *
@@ -81,28 +79,18 @@ def GenerateAssignments(die_to_eligible_boxes, is_box_wide):
 def ConsequencesToCost(consequences):
   return -1.49 * consequences[ConType.Health] - consequences[ConType.Time]
 
-# TODO: Create accessors to all "private" members accessed.
-def main():
-  #hero = Hero.Warrior(); encounter = CombatEncounter.Skeleton()  # Armored
-  hero = Hero.Mage(); encounter = CombatEncounter.FireElemental()  # Wide box
-  
-  print hero, encounter
-  challenge_boxes = encounter._challenge
-
+def GetAverageConsequences(dice_counts, challenge_boxes):
   average_consequences = Consequences()
-  NUM_TRIALS = 1000
+  NUM_TRIALS = 10
   for trial in xrange(1, NUM_TRIALS + 1):
-    rolled_dice = Roll(hero.GetDiceCounts())
+    rolled_dice = Roll(dice_counts)
     # Sort the rolled dice by type and value ascending.
     rolled_dice.sort(key=lambda kv: (kv[0].value, kv[1]))
     # Rolled dice arrangement is now fixed so that we can rely on indicies.
-    print "Trial #{0}: Rolled {1}".format(trial, rolled_dice)
-
+    #print "Trial #{0}: Rolled {1}".format(trial, rolled_dice)
+    
     die_to_eligible_boxes = GetDieToBoxPossibilities(rolled_dice,
                                                      challenge_boxes)
-    #print rolled_dice
-    #print challenge_boxes
-    #print die_to_eligible_boxes
     
     # Create a list of all the possible assignments and their consequences.
     possible_assignments = []
@@ -110,23 +98,64 @@ def main():
         die_to_eligible_boxes, map(lambda box: box._is_wide, challenge_boxes)):
       consequences = GetConsequences(rolled_dice, challenge_boxes, assignments)
       possible_assignments.append((assignments, consequences))
-
+      
     # Sort the possible moves using a cost function.
-    possible_assignments.sort(key=lambda move_and_consequences: ConsequencesToCost(move_and_consequences[1]))
-
-    #print "Worst 3 moves:"
-    #for move in possible_assignments[:3]: print move
-    #print "Best 3 moves:"
-    #for move in possible_assignments[-3:]: print move
+    possible_assignments.sort(key=lambda move_and_consequences: \
+                              ConsequencesToCost(move_and_consequences[1]))
 
     # Record this trial's best move's consequences and cost
     best_move, consequences = possible_assignments[-1]
     average_consequences += consequences
 
-  # After all the trials are done, output an average cost.
-  print "Average consequences of encounter:"
-  for key, value in average_consequences.iteritems():
-    print key, float(value) / NUM_TRIALS
+    # After all the trials are done, output an average cost.
+    #print "Average consequences of encounter:"
+    #for key, value in average_consequences.iteritems():
+    #  print key, float(value) / NUM_TRIALS
+  for key in average_consequences:
+    average_consequences[key] = float(average_consequences[key]) / NUM_TRIALS
+  return average_consequences
+  
+
+# TODO: Create accessors to all "private" members accessed.
+def main():
+  with open('/var/tmp/results.csv', 'w') as csvfile:
+    fieldnames = ['hero', 'encounter', 'health_dmg', 'time_dmg', 'experience']
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    writer.writeheader()
+    
+    encounters = GetEncounterCards()
+    for hero_ix, hero in enumerate([Hero.Archer(), Hero.Mage(), Hero.Paladin(),
+                                    Hero.Rogue(), Hero.Warrior()]):
+      for encounter_ix, encounter in enumerate(encounters):
+        
+        # TODO: Replace private member access with accessors
+
+        consequences = None
+        if type(encounter) is CombatEncounter:
+          consequences = GetAverageConsequences(
+            hero.GetDiceCounts(), encounter._challenge)
+          writer.writerow({'hero': hero._name,
+                           'encounter': encounter._name,
+                           'health_dmg': consequences[ConType.Health],
+                           'time_dmg': consequences[ConType.Time],
+                           'experience': encounter.AsExperience()})
+        elif type(encounter) is PerilEncounter:
+          free_consequences = GetAverageConsequences(
+            hero.GetDiceCounts(), encounter._free_challenge)          
+          paid_consequences = GetAverageConsequences(
+            hero.GetDiceCounts(), encounter._paid_challenge) + encounter._swap_cost
+          writer.writerow({'hero': hero._name,
+                           'encounter': encounter._name + "_free",
+                           'health_dmg': free_consequences[ConType.Health],
+                           'time_dmg': free_consequences[ConType.Time],
+                           'experience': encounter.AsExperience()})
+          writer.writerow({'hero': hero._name,
+                           'encounter': encounter._name + "_paid",
+                           'health_dmg': free_consequences[ConType.Health],
+                           'time_dmg': free_consequences[ConType.Time],
+                           'experience': encounter.AsExperience()})
+        
+      
     
 if __name__ == '__main__':
   main()
