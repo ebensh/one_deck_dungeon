@@ -128,70 +128,70 @@ class PerilEncounter(Encounter):
   def ArrowWall(variant=False):
     stats = HeroStats.Magic() if variant else HeroStats.Strength()
     return PerilEncounter('ArrowWall',
-      ChallengeBox.Parse('m6whhttt'), ChallengeBox.Parse('a11whhhtt'),
+      ParseChallengeBoxes('m6whhttt'), ParseChallengeBoxes('a11whhhtt'),
       Consequences(time=1), 2, stats)
 
   @staticmethod
   def BearTraps(variant=False):
     stats = HeroStats.Magic() if variant else HeroStats.Agility()
     return PerilEncounter('BearTraps',
-      ChallengeBox.Parse('a6whht'), ChallengeBox.Parse('a11whhhtt'),
+      ParseChallengeBoxes('a6whht'), ParseChallengeBoxes('a11whhhtt'),
       Consequences(time=3), 2, stats)
 
   @staticmethod
   def Boulder(variant=False):
     stats = HeroStats.MagicHealth() if variant else HeroStats.StrengthHealth()
     return PerilEncounter('Boulder',
-      ChallengeBox.Parse('m11whhhtt'), ChallengeBox.Parse('a14whhhht'),
+      ParseChallengeBoxes('m11whhhtt'), ParseChallengeBoxes('a14whhhht'),
       Consequences(time=3), 4, stats)
 
   @staticmethod
   def CaveIn(variant=False):
     stats = HeroStats.Magic() if variant else HeroStats.Agility()
     return PerilEncounter('CaveIn',
-      ChallengeBox.Parse('s6whttt'), ChallengeBox.Parse('a11whhtt'),
+      ParseChallengeBoxes('s6whttt'), ParseChallengeBoxes('a11whhtt'),
       Consequences(time=2), 2, stats)
 
   @staticmethod
   def FlameStatues(variant=False):
     stats = HeroStats.Magic() if variant else HeroStats.Strength()
     return PerilEncounter('FlameStatues',
-      ChallengeBox.Parse('m8whhttt'), ChallengeBox.Parse('a14whhht'),
+      ParseChallengeBoxes('m8whhttt'), ParseChallengeBoxes('a14whhht'),
       Consequences(time=3), 3, stats)
   
   @staticmethod
   def ForceWall(variant=False):
     stats = HeroStats.MagicHealth() if variant else HeroStats.StrengthHealth()
     return PerilEncounter('ForceWall',
-      ChallengeBox.Parse('a11whhtttt'), ChallengeBox.Parse('m14whhhhtt'),
+      ParseChallengeBoxes('a11whhtttt'), ParseChallengeBoxes('m14whhhhtt'),
       Consequences(time=3), 4, stats)
 
   @staticmethod
   def LockedDoor(variant=False):
     stats = HeroStats.Magic() if variant else HeroStats.Strength()
     return PerilEncounter('LockedDoor',
-      ChallengeBox.Parse('a8whtttt'), ChallengeBox.Parse('s11whhtt'),
+      ParseChallengeBoxes('a8whtttt'), ParseChallengeBoxes('s11whhtt'),
       Consequences(time=1), 2, stats)
 
   @staticmethod
   def PitOfSpikes(variant=False):
     stats = HeroStats.Magic() if variant else HeroStats.Strength()
     return PerilEncounter('PitOfSpikes',
-      ChallengeBox.Parse('s8whhtt'), ChallengeBox.Parse('a14whhhtt'),
+      ParseChallengeBoxes('s8whhtt'), ParseChallengeBoxes('a14whhhtt'),
       Consequences(time=3), 3, stats)
 
   @staticmethod
   def RunePuzzle(variant=False):
     stats = HeroStats.Agility() if variant else HeroStats.Strength()
     return PerilEncounter('RunePuzzle',
-      ChallengeBox.Parse('m6whttt'), ChallengeBox.Parse('s11whhhtt'),
+      ParseChallengeBoxes('m6whttt'), ParseChallengeBoxes('s11whhhtt'),
       Consequences(time=2), 2, stats)
 
   @staticmethod
   def SpikedLog(variant=False):
     stats = HeroStats.Agility()  # Both variants
     return PerilEncounter('SpikedLog',
-      ChallengeBox.Parse('s8whhht'), ChallengeBox.Parse('a14whhhtt'),
+      ParseChallengeBoxes('s8whhht'), ParseChallengeBoxes('a14whhhtt'),
       Consequences(time=2), 3, stats)
 
 
