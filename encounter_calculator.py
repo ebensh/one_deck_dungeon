@@ -1,4 +1,5 @@
 import csv
+import sys
 #from pprint import pprint
 #from random import seed, shuffle
 
@@ -81,7 +82,7 @@ def ConsequencesToCost(consequences):
 
 def GetAverageConsequences(dice_counts, challenge_boxes):
   average_consequences = Consequences()
-  NUM_TRIALS = 10
+  NUM_TRIALS = 1000
   for trial in xrange(1, NUM_TRIALS + 1):
     rolled_dice = Roll(dice_counts)
     # Sort the rolled dice by type and value ascending.
@@ -118,44 +119,43 @@ def GetAverageConsequences(dice_counts, challenge_boxes):
 
 # TODO: Create accessors to all "private" members accessed.
 def main():
-  with open('/var/tmp/results.csv', 'w') as csvfile:
-    fieldnames = ['hero', 'encounter', 'health_dmg', 'time_dmg', 'experience']
+  heroes = [Hero.Archer(), Hero.Mage(), Hero.Paladin(), Hero.Rogue(),
+            Hero.Warrior()]
+  encounters = GetEncounterCards()
+
+  with sys.stdout as csvfile:
+    fieldnames = ['encounter', 'experience']
+    for hero in heroes:
+      fieldnames.append(hero._name + '_health_dmg')
+      fieldnames.append(hero._name + '_time_dmg')
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
-    
-    encounters = GetEncounterCards()
-    for hero_ix, hero in enumerate([Hero.Archer(), Hero.Mage(), Hero.Paladin(),
-                                    Hero.Rogue(), Hero.Warrior()]):
-      for encounter_ix, encounter in enumerate(encounters):
+
+    for encounter_ix, encounter in enumerate(encounters):
+      for hero_ix, hero in enumerate(heroes):
         
         # TODO: Replace private member access with accessors
-
         consequences = None
         if type(encounter) is CombatEncounter:
           consequences = GetAverageConsequences(
             hero.GetDiceCounts(), encounter._challenge)
-          writer.writerow({'hero': hero._name,
-                           'encounter': encounter._name,
-                           'health_dmg': consequences[ConType.Health],
-                           'time_dmg': consequences[ConType.Time],
-                           'experience': encounter.AsExperience()})
+          writer.writerow({'encounter': encounter._name,
+                           'experience': encounter.AsExperience(),
+                           hero._name + '_health_dmg': consequences[ConType.Health],
+                           hero._name + '_time_dmg': consequences[ConType.Time]})
         elif type(encounter) is PerilEncounter:
           free_consequences = GetAverageConsequences(
-            hero.GetDiceCounts(), encounter._free_challenge)          
+            hero.GetDiceCounts(), encounter._free_challenge)
           paid_consequences = GetAverageConsequences(
-            hero.GetDiceCounts(), encounter._paid_challenge) + encounter._swap_cost
-          writer.writerow({'hero': hero._name,
-                           'encounter': encounter._name + "_free",
-                           'health_dmg': free_consequences[ConType.Health],
-                           'time_dmg': free_consequences[ConType.Time],
-                           'experience': encounter.AsExperience()})
-          writer.writerow({'hero': hero._name,
-                           'encounter': encounter._name + "_paid",
-                           'health_dmg': free_consequences[ConType.Health],
-                           'time_dmg': free_consequences[ConType.Time],
-                           'experience': encounter.AsExperience()})
-        
-      
+          hero.GetDiceCounts(), encounter._paid_challenge) + encounter._swap_cost
+          writer.writerow({'encounter': encounter._name + '_free',
+                           'experience': encounter.AsExperience(),
+                           hero._name + '_health_dmg': free_consequences[ConType.Health],
+                           hero._name + '_time_dmg': free_consequences[ConType.Time]})
+          writer.writerow({'encounter': encounter._name + '_paid',
+                           'experience': encounter.AsExperience(),
+                           hero._name + '_health_dmg': paid_consequences[ConType.Health],
+                           hero._name + '_time_dmg': paid_consequences[ConType.Time]})                            
     
 if __name__ == '__main__':
   main()
