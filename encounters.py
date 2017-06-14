@@ -40,7 +40,7 @@ class CombatEncounter(Encounter):
     stats = HeroStats.Magic() if variant else HeroStats.Agility()
     return CombatEncounter('Bandit',
       ParseChallengeBoxes('a8whh,a3h,a4t,s5tt,s5ht'), 3, stats)
-  
+
   @staticmethod
   def Beetle(variant=False):
     stats = HeroStats.Magic()  # Both variants
@@ -58,7 +58,7 @@ class CombatEncounter(Encounter):
     stats = HeroStats.Magic() if variant else HeroStats.StrengthHealth()
     return CombatEncounter('GloopingOoze',
       ParseChallengeBoxes('m2a,m3a,s4ht,s4ht,m5tt,s6ht'), 3, stats)
-  
+
   @staticmethod
   def Goblin(variant=False):
     # TODO: Replace the first box with its proper X! It depends on the number

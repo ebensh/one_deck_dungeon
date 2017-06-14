@@ -22,6 +22,12 @@ class DieType(Enum):
   Any = 'x'
   def __repr__(self): return self.value
 
+class Die(object):
+  '''Represents a physical die.'''
+  def __init__(self, die_type, value=None):
+    self._die_type = die_type
+    self._value = randint(1, 6) if value is None else value
+
 class HeroStats(Counter):
   '''A Counter of Strength, Agility, Magic, and Health.'''
   def __init__(self, strength=0, agility=0, magic=0, health=0):
